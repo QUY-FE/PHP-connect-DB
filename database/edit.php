@@ -53,8 +53,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 <head>
     <meta charset="UTF-8">
-    <title>Sửa Học Sinh</title>
-    <link rel="stylesheet" href="output.css">
+    <title>Sửa thông tin học sinh</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
