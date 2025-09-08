@@ -24,7 +24,7 @@ form {
   margin-top: 100px;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 1px;
   width: 300px;
 }
 
@@ -53,7 +53,6 @@ select {
   border: 1px solid #ccc;
   border-radius: 4px;
   font-size: 16px;
-  
 }
 
 button {
@@ -82,13 +81,16 @@ p {
 .btn {
   display: block;
   padding: 8px 16px;
+  margin: 12px auto;
   background-color: #007bff;
   border: none;
   color: white;
   font-size: 16px;
   border-radius: 4px;
   cursor: pointer;
+  transition: background-color 0.3s ease;
   text-decoration: none;
+  text-align: center;
 }
 .btn:hover {
   background-color: #0056b3;
