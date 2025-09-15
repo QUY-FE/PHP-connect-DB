@@ -1,7 +1,7 @@
 <?php
 require_once 'connect.php';
-$name = $age = $address = '';
-$nameError = $ageError = $addressError = '';
+$name = $class_name = $address = '';
+$nameError = $class_nameError = $addressError = '';
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Kiểm tra dữ liệu khi submit cột name
     if (empty($_POST['name'])) {
@@ -17,38 +17,34 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $nameError = '';
     }
     // Kiểm tra dữ liệu khi submit cột age
-    if (empty($_POST['age'])) {
-        $ageError = 'Không để trống cột tuổi';
-    } elseif (!is_numeric($_POST['age'])) {
-        $ageError = 'Tuổi phải là số';
-    } elseif ($_POST['age'] < 5 || $_POST['age'] > 100) {
-        $ageError = 'Tuổi phải từ 5 đến 100';
+    if (empty($_POST['class_name'])) {
+        $class_nameError = 'Không để trống cột tuổi';
     } else {
-        $age = (int) $_POST['age'];
-        $ageError = '';
+        $class_name = $_POST['class_name'];
+        $class_nameError = '';
     }
     // Kiểm tra dữ liệu khi submit cột address
     $validAdress = ["Lạng sơn", "Hà Nội", "Bắc Ninh", "Phú Thọ", "Quảng Ninh", "Hải Phòng", "Cao Bằng", "Điện Biên Phủ", "Hà Giang"];
 
-    if (empty($_POST['adress'])) {
+    if (empty($_POST['address'])) {
         $addressError = 'Không để trống cột địa chỉ';
-    } elseif (!in_array($_POST['adress'], $validAdress)) {
+    } elseif (!in_array($_POST['address'], $validAdress)) {
         $addressError = 'Địa chỉ không hợp lệ';
     } else {
-        $address = htmlspecialchars($_POST['adress']);
+        $address = htmlspecialchars($_POST['address']);
         $addressError = '';
     }
 
 
     // Nếu không có lỗi Thêm vào db
-    if ($nameError === '' && $ageError === '' && $addressError === '') {
+    if ($nameError === '' && $class_nameError === '' && $addressError === '') {
         $data = [
             ':name' => $name,
-            ':age' => $age,
-            ':adress' => $address,
+            ':class_name' => $class_name,
+            ':address' => $address,
         ];
-        $sql = "INSERT INTO student (name, age,adress)
-                 VALUES (:name,:age,:adress)";
+        $sql = "INSERT INTO users (name, class_name,address)
+                 VALUES (:name,:class_name,:address)";
         $tmp = $pdo->prepare($sql);
         $tmp->execute($data);
         header("Location: index.php");
@@ -75,12 +71,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <input type="text" name="name" value="<?= $name ?>" placeholder="Nhập Họ và tên"> <br>
         <span style="color: red;"><?= $nameError ?></span><br>
 
-        Tuổi:
-        <input type="text" name="age" value="<?= $age ?>" placeholder="Nhập tuổi"> <br>
-        <span style="color: red;"><?= $ageError ?></span><br>
+        Lớp
+        <input type="text" name="class_name" value="<?= $class_name ?>" placeholder="Nhập Lớp"> <br>
+        <span style="color: red;"><?= $class_nameError ?></span><br>
 
         Địa chỉ:
-        <select name="adress">
+        <select name="address">
             <option value="">-- Chọn địa chỉ --</option>
             <option value="Lạng sơn" <?= $address == "Lạng sơn" ? "selected" : "" ?>>Lạng sơn</option>
             <option value="Hà Nội" <?= $address == "Hà Nội" ? "selected" : "" ?>>Hà Nội</option>

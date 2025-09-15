@@ -2,18 +2,39 @@
 require_once 'connect.php';
 
 try {
-    $sql = "SELECT * FROM student ";
+    $limit = 5;
+    $page = isset($_GET['page']) && is_numeric($_GET['page'])  ? (int)$_GET['page'] : 1;
+
+    $page = max(1, $page);
+    $offset = ($page - 1) * $limit;
+
+    $cntSQL = "SELECT COUNT(*) FROM users";
     $params = [];
-    if ($_SERVER['REQUEST_METHOD'] == 'GET') {
-        if (!empty($_GET['keyword'])) {
-            $keyword = '%' . $_GET['keyword'] . '%';
-            $sql .= ' WHERE name LIKE :keyword';
-            $params['keyword'] = $keyword;
-        }
+
+    if (!empty($_GET['keyword'])) {
+        $keyword = '%' . $_GET['keyword'] . '%';
+        $cntSQL .= ' WHERE name LIKE :keyword';
+        $params['keyword'] = $keyword;
     }
-    $tmp = $pdo->prepare($sql);
+    $tmp = $pdo->prepare($cntSQL);
     $tmp->execute($params);
-    $datas = $tmp->fetchAll(PDO::FETCH_ASSOC);
+    $total_records = (int) $tmp->fetchColumn();
+    $total_pages = $total_records > 0 ? ceil($total_records / $limit) : 1;
+
+    $sql = "SELECT * FROM users";
+    if (!empty($_GET['keyword'])) {
+        $sql .= " WHERE name LIKE :keyword";
+    }
+    $sql .= " LIMIT :limit OFFSET :offset";
+    $tmp = $pdo->prepare($sql);
+
+        if (!empty($_GET['keyword'])) {
+            $tmp->bindValue(':keyword', $keyword, PDO::PARAM_STR);
+        }
+        $tmp->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $tmp->bindValue(':offset', $offset, PDO::PARAM_INT);
+        $tmp->execute();
+        $datas = $tmp->fetchAll(PDO::FETCH_ASSOC);
 } catch (\Throwable $e) {
     echo 'Lỗi,Không thể truy vấn dữ liệu' . $e->getMessage();
 }
@@ -51,13 +72,13 @@ try {
         <tbody>
             <?php
             if (count($datas) > 0) {
-                foreach ($datas as $data)
+                foreach ($datas as $key => $data)
                     echo
                     "<tr>
             <td> {$data['id']} </td>
             <td> {$data['name']}</td>
-            <td> {$data['age']}</td>
-            <td> {$data['adress']}</td>
+            <td> {$data['class_name']}</td>
+            <td> {$data['address']}</td>
             <td style='display: flex; gap:12px;'>
             
             <a href='edit.php?id={$data['id']}' class='btn'>Sửa</a> 
@@ -79,6 +100,16 @@ try {
             ?>
         </tbody>
     </table><br>
+    <div style="margin-top:20px;">
+        <?php if ($total_pages > 1): ?>
+            <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+                <a href="?page=<?= $i ?>&keyword=<?= isset($_GET['keyword']) ? htmlspecialchars($_GET['keyword']) : '' ?>"
+                    style="margin:0 5px; <?= $i == $page ? 'font-weight:bold; color:red;' : '' ?>">
+                    <?= $i ?>
+                </a>
+            <?php endfor; ?>
+        <?php endif; ?>
+    </div>
 
 
 

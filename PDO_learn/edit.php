@@ -1,11 +1,11 @@
 <?php
 require_once 'connect.php';
 
-$name = $age = $address = '';
-$nameError = $ageError = $addressError = '';
+$name = $class_name = $address = '';
+$nameError = $class_nameError = $addressError = '';
 
 $id = $_GET['id'];
-$sql = "SELECT * FROM student WHERE id=:id";
+$sql = "SELECT * FROM users WHERE id=:id";
 $tmp = $pdo->prepare($sql);
 $tmp->execute(['id' => $id]);
 $data = $tmp->fetch(PDO::FETCH_ASSOC);
@@ -21,28 +21,28 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $name = htmlspecialchars($_POST['name']);
         $nameError = '';
     }
-    // Kiểm tra dữ liệu khi submit cột age
-    if (empty($_POST['age'])) {
-        $ageError = 'Không để trống cột tuổi';
+    // Kiểm tra dữ liệu khi submit cột class_name
+    if (empty($_POST['class_name'])) {
+        $class_nameError = 'Không để trống cột tuổi';
     } else {
-        $age = htmlspecialchars((int)$_POST['age']);
-        $ageError = '';
+        $class_name = htmlspecialchars($_POST['class_name']);
+        $class_nameError = '';
     }
     // Kiểm tra dữ liệu khi submit cột address
-    if (empty($_POST['adress'])) {
+    if (empty($_POST['address'])) {
         $addressError = 'Không để trống cột địa chỉ';
     } else {
-        $address = htmlspecialchars($_POST['adress']);
+        $address = htmlspecialchars($_POST['address']);
         $addressError = '';
     }
-    if ($nameError === '' && $ageError === '' && $addressError === '') {
+    if ($nameError === '' && $class_nameError === '' && $addressError === '') {
         $data = [
             'id' => $id,
             'name' => $name,
-            'age' => $age,
-            'adress' => $address,
+            'class_name' => $class_name,
+            'address' => $address,
         ];
-        $sql = "UPDATE student SET name = :name, age = :age, adress = :adress WHERE id = :id";
+        $sql = "UPDATE users SET name = :name, class_name = :class_name, address = :address WHERE id = :id";
         $tmp = $pdo->prepare($sql);
         $tmp->execute($data);
         header("Location: index.php");
@@ -70,21 +70,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <span style="color: red;"><?= $nameError ?></span><br>
 
         Tuổi:
-        <input type="text" name="age" value="<?= $data['age'] ?>"> <br>
-        <span style="color: red;"><?= $ageError ?></span><br>
+        <input type="text" name="class_name" value="<?= $data['class_name'] ?>"> <br>
+        <span style="color: red;"><?= $class_nameError ?></span><br>
 
         Địa chỉ:
-        <select name="adress">
+        <select name="address">
             <option value="">-- Chọn địa chỉ --</option>
-            <option value="Lạng sơn" <?= $data['adress'] == "Lạng sơn" ? "selected" : "" ?>>Lạng sơn</option>
-            <option value="Hà Nội" <?= $data['adress'] == "Hà Nội" ? "selected" : "" ?>>Hà Nội</option>
-            <option value="Bắc Ninh" <?= $data['adress'] == "Bắc Ninh" ? "selected" : "" ?>>Bắc Ninh</option>
-            <option value="Phú Thọ" <?= $data['adress'] == "Phú Thọ" ? "selected" : "" ?>>Phú Thọ</option>
-            <option value="Quảng Ninh" <?= $data['adress'] == "Quảng Ninh" ? "selected" : "" ?>>Quảng Ninh</option>
-            <option value="Hải Phòng" <?= $data['adress'] == "Hải Phòng" ? "selected" : "" ?>>Hải Phòng</option>
-            <option value="Cao Bằng" <?= $data['adress'] == "Cao Bằng" ? "selected" : "" ?>>Cao Bằng</option>
-            <option value="Điện Biên Phủ" <?= $data['adress'] == "Điện Biên Phủ" ? "selected" : "" ?>>Điện Biên Phủ</option>
-            <option value="Hà Giang" <?= $data['adress'] == "Hà Giang" ? "selected" : "" ?>>Hà Giang</option>
+            <option value="Lạng sơn" <?= $data['address'] == "Lạng sơn" ? "selected" : "" ?>>Lạng sơn</option>
+            <option value="Hà Nội" <?= $data['address'] == "Hà Nội" ? "selected" : "" ?>>Hà Nội</option>
+            <option value="Bắc Ninh" <?= $data['address'] == "Bắc Ninh" ? "selected" : "" ?>>Bắc Ninh</option>
+            <option value="Phú Thọ" <?= $data['address'] == "Phú Thọ" ? "selected" : "" ?>>Phú Thọ</option>
+            <option value="Quảng Ninh" <?= $data['address'] == "Quảng Ninh" ? "selected" : "" ?>>Quảng Ninh</option>
+            <option value="Hải Phòng" <?= $data['address'] == "Hải Phòng" ? "selected" : "" ?>>Hải Phòng</option>
+            <option value="Cao Bằng" <?= $data['address'] == "Cao Bằng" ? "selected" : "" ?>>Cao Bằng</option>
+            <option value="Điện Biên Phủ" <?= $data['address'] == "Điện Biên Phủ" ? "selected" : "" ?>>Điện Biên Phủ</option>
+            <option value="Hà Giang" <?= $data['address'] == "Hà Giang" ? "selected" : "" ?>>Hà Giang</option>
         </select>
         <span style="color: red;"><?= $addressError ?></span> <br><br>
 
