@@ -3,44 +3,27 @@ require_once 'connect.php';
 
 try {
     $limit = 5;
-    $page = isset($_GET['page']) && is_numeric($_GET['page'])  ? (int)$_GET['page'] : 1;
-
+    $page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
     $page = max(1, $page);
     $offset = ($page - 1) * $limit;
 
-    $cntSQL = "SELECT COUNT(*) FROM users";
-    $params = [];
-
-    if (!empty($_GET['keyword'])) {
-        $keyword = '%' . $_GET['keyword'] . '%';
-        $cntSQL .= ' WHERE name LIKE :keyword';
-        $params['keyword'] = $keyword;
-    }
-    $tmp = $pdo->prepare($cntSQL);
-    $tmp->execute($params);
-    $total_records = (int) $tmp->fetchColumn();
+    // Đếm tổng số bản ghi
+    $cntSQL = "SELECT COUNT(*) FROM sinhvien";
+    $stmt = $pdo->query($cntSQL);
+    $total_records = (int)$stmt->fetchColumn();
     $total_pages = $total_records > 0 ? ceil($total_records / $limit) : 1;
 
-    $sql = "SELECT * FROM users";
-    if (!empty($_GET['keyword'])) {
-        $sql .= " WHERE name LIKE :keyword";
-    }
-    $sql .= " LIMIT :limit OFFSET :offset";
-    $tmp = $pdo->prepare($sql);
+    // Lấy danh sách sinh viên theo phân trang
+    $sql = "SELECT * FROM sinhvien LIMIT :limit OFFSET :offset";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+    $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+    $stmt->execute();
+    $datas = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        if (!empty($_GET['keyword'])) {
-            $tmp->bindValue(':keyword', $keyword, PDO::PARAM_STR);
-        }
-        $tmp->bindValue(':limit', $limit, PDO::PARAM_INT);
-        $tmp->bindValue(':offset', $offset, PDO::PARAM_INT);
-        $tmp->execute();
-        $datas = $tmp->fetchAll(PDO::FETCH_ASSOC);
 } catch (\Throwable $e) {
-    echo 'Lỗi,Không thể truy vấn dữ liệu' . $e->getMessage();
+    echo 'Lỗi, Không thể truy vấn dữ liệu: ' . $e->getMessage();
 }
-
-
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -53,66 +36,64 @@ try {
 </head>
 
 <body>
-    <form action="" method="get">
-        <input type="text" name="keyword" placeholder="Tìm Kiếm . . . ." value="<?= isset($_GET['keyword']) ? htmlspecialchars($_GET['keyword']) : ''; ?>">
-        <button type="submit">Tìm Kiếm</button>
-    </form>
-    <h1>Danh sách học sinh</h1><br>
 
-    <table>
-        <thead>
-            <tr style="background-color: #63adfc;">
-                <td>STT</td>
-                <td>Họ và tên</td>
-                <td>Tuổi</td>
-                <td>Địa chỉ</td>
-                <td>Chức năng</td>
+    <h1 class="student-list__title">Danh sách học sinh</h1>
+
+    <table class="student-list__table">
+        <thead class="student-list__thead">
+            <tr class="student-list__row student-list__row--header">
+                <th class="student-list__cell">Mã SV</th>
+                <th class="student-list__cell">Họ và tên</th>
+                <th class="student-list__cell">Lớp</th>
+                <th class="student-list__cell">Địa chỉ</th>
+                <th class="student-list__cell">Chức năng</th>
             </tr>
         </thead>
-        <tbody>
-            <?php
-            if (count($datas) > 0) {
-                foreach ($datas as $key => $data)
-                    echo
-                    "<tr>
-            <td> {$data['id']} </td>
-            <td> {$data['name']}</td>
-            <td> {$data['class_name']}</td>
-            <td> {$data['address']}</td>
-            <td style='display: flex; gap:12px;'>
-            
-            <a href='edit.php?id={$data['id']}' class='btn'>Sửa</a> 
-            <a href='delete.php?id={$data['id']}' class='btn' '>Xóa</a>
-            </td>                           
-            </tr>";
-                echo
-                "<tr >
-                <td colspan='5'>
-                    <a href='create.php' class='btn'>Thêm học sinh</a><br>
-                </td>
-            </tr>";
-            } else {
-                echo
-                "<tr>
-                    <td colspan='5'> <h3>Không có học sinh nào :( <a href='create.php' class='btn'>Thêm học sinh</a><br></h3> </td>
-                </tr>";
-            }
-            ?>
+        <tbody class="student-list__tbody">
+            <?php if (!empty($datas)): ?>
+                <?php foreach ($datas as $data): ?>
+                    <tr class="student-list__row">
+                        <td class="student-list__cell"><?= htmlspecialchars($data['ma_sv']) ?></td>
+                        <td class="student-list__cell"><?= htmlspecialchars($data['hoten']) ?></td>
+                        <td class="student-list__cell"><?= htmlspecialchars($data['lop']) ?></td>
+                        <td class="student-list__cell"><?= htmlspecialchars($data['diachi']) ?></td>
+                        <td class="student-list__cell student-list__cell--actions">
+                            <a href="info.php?id=<?= $data['id'] ?>" class="student-list__btn student-list__btn--info">Xem thông tin</a>
+                            <a href="edit.php?id=<?= $data['id'] ?>" class="student-list__btn">Sửa</a>
+                            <a href="delete.php?id=<?= $data['id'] ?>" class="student-list__btn student-list__btn--danger">Xóa</a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+
+                <tr class="student-list__row">
+                    <td colspan="5" class="student-list__cell student-list__cell--center">
+                        <a href="create.php" class="student-list__btn student-list__btn--primary">Thêm học sinh</a>
+                    </td>
+                </tr>
+            <?php else: ?>
+                <tr class="student-list__row">
+                    <td colspan="5" class="student-list__cell student-list__cell--center">
+                        <h3>Không có học sinh nào 
+                            <a href="create.php" class="student-list__btn student-list__btn--primary">Thêm học sinh</a>
+                        </h3>
+                    </td>
+                </tr>
+            <?php endif; ?>
         </tbody>
-    </table><br>
-    <div style="margin-top:20px;">
+    </table>
+
+    <div class="student-list__pagination">
         <?php if ($total_pages > 1): ?>
             <?php for ($i = 1; $i <= $total_pages; $i++): ?>
-                <a href="?page=<?= $i ?>&keyword=<?= isset($_GET['keyword']) ? htmlspecialchars($_GET['keyword']) : '' ?>"
-                    style="margin:0 5px; <?= $i == $page ? 'font-weight:bold; color:red;' : '' ?>">
+                <a href="?page=<?= $i ?>" 
+                   class="student-list__pagination-link <?= $i == $page ? 'student-list__pagination-link--active' : '' ?>">
                     <?= $i ?>
                 </a>
             <?php endfor; ?>
         <?php endif; ?>
     </div>
 
-
-
 </body>
+
 
 </html>
