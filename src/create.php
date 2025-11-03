@@ -6,7 +6,9 @@ $ma_svError = $chuyen_nganhError = $emailError = $sdtError = $lopError = $gioi_t
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // sanitize helper
-    $post = function($k) { return isset($_POST[$k]) ? trim($_POST[$k]) : ''; };
+    $post = function ($k) {
+        return isset($_POST[$k]) ? trim($_POST[$k]) : '';
+    };
 
     // ma_sv
     if (empty($post('ma_sv'))) {
@@ -85,8 +87,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $GPAError = 'GPA phải là số';
         } else {
             $gpaVal = (float)$post('GPA');
-            if ($gpaVal < 0 || $gpaVal > 10) {
-                $GPAError = 'GPA phải trong khoảng 0 - 10';
+            if ($gpaVal < 0 || $gpaVal > 4) {
+                $GPAError = 'GPA phải trong khoảng 0 - 4';
             } else {
                 $GPA = $gpaVal;
             }
@@ -202,7 +204,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         <div class="form-student__group">
             <label class="form-student__label">Điểm GPA :</label>
-            <input type="text" name="GPA" value="<?= htmlspecialchars($GPA) ?>" placeholder="Nhập GPA (0-10)" class="form-student__input">
+            <input type="text" name="GPA" value="<?= htmlspecialchars($GPA) ?>" placeholder="Nhập GPA (0-4)" class="form-student__input">
             <span class="form-student__error"><?= $GPAError ?></span>
         </div>
 

@@ -1,18 +1,19 @@
-
 <?php require_once 'connect.php'; ?>
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Giới thiệu - Hệ thống Quản lý Sinh viên</title>
     <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
     <div class="about">
         <div class="about__container">
             <h1 class="about__title">Hệ thống Quản lý Sinh viên</h1>
-            
+
             <div class="about__content">
                 <section class="about__section">
                     <h2 class="about__subtitle">Giới thiệu</h2>
@@ -54,9 +55,10 @@
 
             <div class="about__footer">
                 <a href="index.php" class="about__btn">Quay về trang chủ</a>
-                <p class="about__copyright">© <?= date('Y') ?> Hệ thống Quản lý Sinh viên. All rights reserved.</p>
+                <p class="about__copyright">© <?= date('Y') ?> QUY-FE. All rights reserved.</p>
             </div>
         </div>
     </div>
 </body>
+
 </html>
